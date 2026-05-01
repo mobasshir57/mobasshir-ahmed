@@ -26,7 +26,7 @@ export default function TinyLittleLovePage() {
       const counters = document.querySelectorAll('.metric-number')
       counters.forEach((counter) => {
         const target = parseInt(counter.getAttribute('data-target') || '0')
-        gsap.fromTo(counter, 
+        gsap.fromTo(counter,
           { textContent: '0' },
           {
             textContent: target,
@@ -49,7 +49,7 @@ export default function TinyLittleLovePage() {
       <main className="flex-grow pt-24 pb-24">
         <div className="max-w-7xl mx-auto px-6">
           {/* Back link */}
-          <Link 
+          <Link
             href="/projects"
             className="inline-flex items-center gap-2 text-[#888899] hover:text-[#00D4FF] transition-colors mb-12 font-bold text-sm uppercase tracking-widest group"
           >
@@ -161,10 +161,10 @@ export default function TinyLittleLovePage() {
                   <p className="text-[#888899] text-xs uppercase tracking-widest font-bold">{metric.label}</p>
                 </div>
               ))}
-              
+
               <div className="pt-12">
-                <a 
-                  href="#" 
+                <a
+                  href="https://www.tinylittlelove.be/"
                   className="w-full bg-[#00D4FF] text-[#080810] font-bold px-8 py-5 rounded-md hover:bg-[#22DFFF] active:scale-[0.98] transition-all duration-200 shadow-[0_0_20px_rgba(0,212,255,0.25)] flex items-center justify-center gap-3"
                 >
                   View Live Project <ExternalLink size={18} />

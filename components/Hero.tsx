@@ -138,7 +138,7 @@ export default function Hero() {
               {/* Profile Image */}
               <div className="relative w-full h-full rounded-full overflow-hidden border-4 border-surface shadow-glow">
                 <Image
-                  src="/profile-photo.png"
+                  src="/mobasshir-black.png"
                   alt="Md Mobasshir Ahmed"
                   fill
                   className="object-cover"
