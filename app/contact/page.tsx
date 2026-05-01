@@ -26,7 +26,15 @@ const faqs = [
 
 export default function ContactPage() {
   const [activeFaq, setActiveFaq] = useState<number | null>(null)
-  const [formStatus, setFormStatus] = useState<'idle' | 'success'>('idle')
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [isSuccess, setIsSuccess] = useState(false)
+  const [isError, setIsError] = useState(false)
+  const [name, setName] = useState('')
+  const [email, setEmail] = useState('')
+  const [subject, setSubject] = useState('')
+  const [message, setMessage] = useState('')
+  const [errors, setErrors] = useState<{ name?: string; email?: string; message?: string }>({})
+
   const containerRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -42,11 +50,63 @@ export default function ContactPage() {
     return () => ctx.revert()
   }, [])
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    // Simulate success
-    setFormStatus('success')
+
+    // --- Validation ---
+    const newErrors: { name?: string; email?: string; message?: string } = {}
+    if (!name.trim()) newErrors.name = 'Name is required'
+    if (!email.trim()) newErrors.email = 'Email is required'
+    if (!message.trim()) newErrors.message = 'Message is required'
+
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors)
+      return
+    }
+
+    setErrors({})
+    setIsSubmitting(true)
+    setIsError(false)
+
+    try {
+      const response = await fetch('https://api.web3forms.com/submit', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+        body: JSON.stringify({
+          access_key: 'd8f909d6-74a8-4c6a-bf59-058369a3a956',
+          name: name,
+          email: email,
+          subject: subject || 'New message from portfolio contact form',
+          message: message,
+          from_name: 'Portfolio Contact Form',
+          botcheck: '',
+        }),
+      })
+
+      const data = await response.json()
+
+      if (data.success) {
+        setIsSuccess(true)
+        // Reset all fields
+        setName('')
+        setEmail('')
+        setSubject('')
+        setMessage('')
+      } else {
+        console.error('Web3Forms error:', data)
+        setIsError(true)
+      }
+    } catch (error) {
+      console.error('Network error:', error)
+      setIsError(true)
+    } finally {
+      setIsSubmitting(false)
+    }
   }
+
 
   return (
     <div className="flex flex-col min-h-screen bg-[#080810] text-[#F0F0F0] font-dm-sans" ref={containerRef}>
@@ -152,7 +212,8 @@ export default function ContactPage() {
               {/* Right Column: Form */}
               <div className="lg:col-span-7">
                 <AnimatePresence mode="wait">
-                  {formStatus === 'idle' ? (
+                  {!isSuccess ? (
+
                     <motion.div
                       key="form"
                       initial={{ opacity: 0, x: 20 }}
@@ -161,46 +222,56 @@ export default function ContactPage() {
                       className="bg-[#111120] border border-white/10 p-10 md:p-14 rounded-[20px] shadow-2xl relative overflow-hidden"
                     >
                       <div className="absolute top-0 right-0 w-64 h-64 bg-[#00D4FF]/5 blur-[100px] pointer-events-none" />
-                      
+
                       <div className="mb-10">
                         <h2 className="text-[#F0F0F0] text-3xl font-bold font-syne mb-2">Send a message</h2>
                         <p className="text-[#888899]">I typically respond within 24 hours.</p>
                       </div>
 
-                      <form 
+                      <form
                         onSubmit={handleSubmit}
-                        action="https://formspree.io/f/[USER_ADDS_FORM_ID]" 
-                        method="POST"
                         className="space-y-8"
                       >
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                           <div className="flex flex-col gap-3">
                             <label className="text-xs font-bold uppercase tracking-widest text-[#F0F0F0]">Full Name *</label>
-                            <input 
-                              type="text" 
+                            <input
+                              type="text"
                               name="name"
-                              required
+                              value={name}
+                              onChange={(e) => setName(e.target.value)}
                               placeholder="John Doe"
                               className="bg-[#080810] border border-white/10 p-4 rounded-lg focus:outline-none focus:border-[#00D4FF] transition-colors"
                             />
+                            {errors.name && (
+                              <p style={{ color: '#ef4444', fontSize: '12px', marginTop: '4px' }}>{errors.name}</p>
+                            )}
+
                           </div>
                           <div className="flex flex-col gap-3">
                             <label className="text-xs font-bold uppercase tracking-widest text-[#F0F0F0]">Email Address *</label>
-                            <input 
-                              type="email" 
+                            <input
+                              type="email"
                               name="email"
-                              required
+                              value={email}
+                              onChange={(e) => setEmail(e.target.value)}
                               placeholder="john@example.com"
                               className="bg-[#080810] border border-white/10 p-4 rounded-lg focus:outline-none focus:border-[#00D4FF] transition-colors"
                             />
+                            {errors.email && (
+                              <p style={{ color: '#ef4444', fontSize: '12px', marginTop: '4px' }}>{errors.email}</p>
+                            )}
+
                           </div>
                         </div>
 
                         <div className="flex flex-col gap-3">
                           <label className="text-xs font-bold uppercase tracking-widest text-[#F0F0F0]">Subject</label>
-                          <input 
-                            type="text" 
+                          <input
+                            type="text"
                             name="subject"
+                            value={subject}
+                            onChange={(e) => setSubject(e.target.value)}
                             placeholder="SEO Inquiry / Web Project / Full-time Role"
                             className="bg-[#080810] border border-white/10 p-4 rounded-lg focus:outline-none focus:border-[#00D4FF] transition-colors"
                           />
@@ -208,21 +279,63 @@ export default function ContactPage() {
 
                         <div className="flex flex-col gap-3">
                           <label className="text-xs font-bold uppercase tracking-widest text-[#F0F0F0]">Message *</label>
-                          <textarea 
+                          <textarea
                             name="message"
-                            required
+                            value={message}
+                            onChange={(e) => setMessage(e.target.value)}
                             rows={5}
                             placeholder="Tell me about your project or opportunity..."
                             className="bg-[#080810] border border-white/10 p-4 rounded-lg focus:outline-none focus:border-[#00D4FF] transition-colors resize-none"
                           />
+                          {errors.message && (
+                            <p style={{ color: '#ef4444', fontSize: '12px', marginTop: '4px' }}>{errors.message}</p>
+                          )}
+
                         </div>
 
-                        <button 
+                        <button
                           type="submit"
+                          disabled={isSubmitting}
                           className="w-full bg-[#00D4FF] text-[#080810] font-bold px-8 py-5 rounded-md hover:bg-[#22DFFF] active:scale-[0.98] transition-all duration-200 shadow-[0_0_20px_rgba(0,212,255,0.25)] flex items-center justify-center gap-3"
+                          style={{ opacity: isSubmitting ? 0.7 : 1, cursor: isSubmitting ? 'not-allowed' : 'pointer' }}
                         >
-                          Send Message <Send size={18} />
+                          {isSubmitting ? (
+                            <>
+                              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"
+                                style={{ animation: 'spin 1s linear infinite' }}>
+                                <path d="M21 12a9 9 0 1 1-6.219-8.56" />
+                              </svg>
+                              Sending...
+                            </>
+                          ) : (
+                            <>
+                              Send Message <Send size={18} />
+                            </>
+                          )}
                         </button>
+
+                        {isError && (
+                          <div style={{
+                            marginTop: '12px',
+                            padding: '12px 16px',
+                            background: 'rgba(239,68,68,0.08)',
+                            border: '1px solid rgba(239,68,68,0.25)',
+                            borderRadius: '6px',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '8px',
+                          }}>
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#ef4444" strokeWidth="2">
+                              <circle cx="12" cy="12" r="10" />
+                              <line x1="12" y1="8" x2="12" y2="12" />
+                              <line x1="12" y1="16" x2="12" y2="16" />
+                            </svg>
+                            <span style={{ fontSize: '13px', color: '#ef4444' }}>
+                              Something went wrong. Please try again or email me directly at mobasshir646@gmail.com
+                            </span>
+                          </div>
+                        )}
+
                       </form>
 
                       <div className="mt-8 flex items-center gap-3 text-[#888899] text-xs">
@@ -242,12 +355,13 @@ export default function ContactPage() {
                       </div>
                       <h2 className="text-[#F0F0F0] text-3xl font-bold font-syne mb-4">Message sent!</h2>
                       <p className="text-[#888899] max-w-sm">I've received your inquiry and I'll be in touch within 24 hours. Looking forward to connecting!</p>
-                      <button 
-                        onClick={() => setFormStatus('idle')}
+                      <button
+                        onClick={() => setIsSuccess(false)}
                         className="mt-10 text-[#00D4FF] font-bold underline"
                       >
                         Send another message
                       </button>
+
                     </motion.div>
                   )}
                 </AnimatePresence>
@@ -272,7 +386,7 @@ export default function ContactPage() {
             <div className="space-y-4">
               {faqs.map((faq, i) => (
                 <div key={i} className="bg-[#111120] border border-white/5 rounded-xl overflow-hidden transition-all hover:border-[#00D4FF]/20">
-                  <button 
+                  <button
                     onClick={() => setActiveFaq(activeFaq === i ? null : i)}
                     className="w-full p-6 flex justify-between items-center text-left"
                   >
