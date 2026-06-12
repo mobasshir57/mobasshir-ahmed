@@ -32,11 +32,22 @@ export default function RootLayout({
     <html lang="en" className={`${syne.variable} ${dmSans.variable} antialiased`}>
       <head>
         <Script
-          id="openai-tracking"
+          id="openai-init"
           strategy="beforeInteractive"
           dangerouslySetInnerHTML={{
-            __html: `!function(w,d,s,u){if(w.oaiq)return;var q=function(){q.q.push(arguments)};q.q=[];w.oaiq=q;var j=d.createElement(s);j.async=1;j.src=u;var f=d.getElementsByTagName(s)[0];f.parentNode.insertBefore(j,f)}(window,document,"script","https://bzrcdn.openai.com/sdk/oaiq.min.js");oaiq("init",{pixelId:"73ateCDXoZVkkQspZc62s3",debug:true});`
+            __html: `
+              window.oaiq = window.oaiq || function () {
+                (window.oaiq.q = window.oaiq.q || []).push(arguments);
+              };
+              oaiq("init", { pixelId: "7xQf6u5yVfVCMFo6ey13kP" });
+              oaiq("measure", "page_viewed", { type: "contents" });
+            `
           }}
+        />
+        <Script
+          id="openai-pixel"
+          strategy="afterInteractive"
+          src="https://bzrcdn.openai.com/sdk/oaiq.min.js"
         />
       </head>
       <body className="bg-background text-text">

@@ -83,14 +83,19 @@ export default function Contact() {
                 className="space-y-8 relative z-10"
                 onSubmit={(e) => {
                   e.preventDefault()
+
                   // Track the conversion event using OpenAI Pixel
                   if (typeof window !== 'undefined' && window.oaiq) {
-                    window.oaiq("measure", "contact_submitted", {
-                      type: "lead"
+                    window.oaiq("measure", "lead_created", {
+                      type: "customer_action"
                     }, {
-                      event_id: `contact_home_${Date.now()}`
+                      event_id: `lead_home_${Date.now()}`
+                    });
+                    window.oaiq("measure", "appointment_scheduled", {
+                      type: "customer_action"
                     });
                   }
+
                   // Temporary success alert for the un-wired form
                   alert("Message submitted successfully!");
                 }}
