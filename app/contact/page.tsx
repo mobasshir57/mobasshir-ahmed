@@ -90,6 +90,16 @@ export default function ContactPage() {
 
       if (data.success) {
         setIsSuccess(true)
+        
+        // Track the conversion event using OpenAI Pixel
+        if (typeof window !== 'undefined' && window.oaiq) {
+          window.oaiq("measure", "contact_submitted", {
+            type: "lead"
+          }, {
+            event_id: `contact_${Date.now()}`
+          });
+        }
+
         // Reset all fields
         setName('')
         setEmail('')

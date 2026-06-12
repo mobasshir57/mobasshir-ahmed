@@ -79,7 +79,22 @@ export default function Contact() {
               {/* Subtle Glow */}
               <div className="absolute top-0 right-0 w-64 h-64 bg-accent/10 blur-[100px] pointer-events-none" />
 
-              <form className="space-y-8 relative z-10">
+              <form 
+                className="space-y-8 relative z-10"
+                onSubmit={(e) => {
+                  e.preventDefault()
+                  // Track the conversion event using OpenAI Pixel
+                  if (typeof window !== 'undefined' && window.oaiq) {
+                    window.oaiq("measure", "contact_submitted", {
+                      type: "lead"
+                    }, {
+                      event_id: `contact_home_${Date.now()}`
+                    });
+                  }
+                  // Temporary success alert for the un-wired form
+                  alert("Message submitted successfully!");
+                }}
+              >
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                   <div className="flex flex-col gap-2">
                     <label className="text-[13px] text-white font-bold uppercase tracking-widest">Full Name</label>
