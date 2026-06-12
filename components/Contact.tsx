@@ -86,11 +86,6 @@ export default function Contact() {
 
                   // Track the conversion event using OpenAI Pixel
                   if (typeof window !== 'undefined' && window.oaiq) {
-                    window.oaiq("measure", "lead_created", {
-                      type: "customer_action"
-                    }, {
-                      event_id: `lead_home_${Date.now()}`
-                    });
                     window.oaiq("measure", "appointment_scheduled", {
                       type: "customer_action"
                     });
