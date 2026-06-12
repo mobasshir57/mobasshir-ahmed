@@ -5,6 +5,7 @@ import Script from "next/script";
 import "./globals.css";
 import SmoothScroll from "@/components/SmoothScroll";
 import CustomCursor from "@/components/CustomCursor";
+import OpenAIPixelTracker from "@/components/OpenAIPixelTracker";
 
 const syne = Syne({
   variable: "--font-syne",
@@ -40,7 +41,6 @@ export default function RootLayout({
                 (window.oaiq.q = window.oaiq.q || []).push(arguments);
               };
               oaiq("init", { pixelId: "7xQf6u5yVfVCMFo6ey13kP" });
-              oaiq("measure", "page_viewed", { type: "contents" });
             `
           }}
         />
@@ -51,6 +51,7 @@ export default function RootLayout({
         />
       </head>
       <body className="bg-background text-text">
+        <OpenAIPixelTracker />
         <CustomCursor />
         <SmoothScroll>
           {children}
