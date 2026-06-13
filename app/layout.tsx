@@ -32,6 +32,7 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${syne.variable} ${dmSans.variable} antialiased`}>
       <head>
+        <meta name="google-site-verification" content="cMdMT2cqtH2b-rJFXP9w7UP0DlgojbXvCds4usnvRw8" />
         {/* Google Tag Manager */}
         <Script
           id="google-tag-manager"
